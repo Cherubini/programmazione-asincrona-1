@@ -20,15 +20,15 @@ class Todolist{
     }
 
     removeTodo(todo){
-        this.todoArray.filter((element) => element!=todo)
+        this.todoArray = this.todoArray.filter((element) => element!==todo)
     }
 
     sortByTitle(){
-
+        return this.todoArray.sort((todo1,todo2) => todo1.compareByTitle(todo2));
     }
 
     sortByCreationDate(){
-
+        return this.todoArray.sort((todo1,todo2) => todo1.compareByCreationDate(todo2));
     }
 
     completeTodo(todo){
