@@ -17,6 +17,6 @@ color: #515151;
 }
 
 .completed{
-    border: 8px;
-    border-color: greed;
+    border-color: green;
+    border-width: 8px;
 }

@@ -17,75 +17,134 @@ function fillTodoArrayFromServer(data) {
     }
 }
 
-    
 function displayTodos() {
-    const superListTitle = document.getElementById('list-name');
     const superListUl = document.getElementById('todo-list');
+    const superListTitle = document.getElementById('list-name');
     const titleNode = document.createTextNode(superList.title);
-    
     superListTitle.innerHTML = '';
-    superListUl.innerHTML = '';
 
-    superListTitle.appendChild(titleNode);
 
-    for (let i = 0; i < superList.todoArray.length; i++) {
-        const todo = superList.todoArray[i];
-
-        const newLi = document.createElement('li');
-        newLi.classList.add('todo-li');
-
-        const titleSpan = document.createElement('span');
-        titleSpan.classList.add('todo-title');
-
-        const todoCompleted = document.createElement('button');
-        const todoDeleted = document.createElement('button');
-        todoCompleted.classList.add('todo-completed');
-        if (todo.isCompleted) {
-            newLi.classList.add('completed');
-        }
-
-        const dateSpan = document.createElement('span');
-        dateSpan.classList.add('todo-date');
-        
-        const titleNode = document.createTextNode(todo.title);
-        const dateNode = document.createTextNode(todo.creationDate.toDateString());
-        const completedNode = document.createTextNode('completato');
-        const deletedNode = document.createTextNode('cancella');
-
-        titleSpan.appendChild(titleNode);
-        dateSpan.appendChild(dateNode);
-        todoCompleted.appendChild(completedNode);
-        todoDeleted.appendChild(deletedNode);
-
-        newLi.appendChild(titleSpan);
-        newLi.appendChild(dateSpan);
-        newLi.appendChild(todoCompleted);
-        newLi.appendChild(todoDeleted);
-        
-        superListUl.appendChild(newLi);
-        
-    }
-    addButtonsListeners(superList);
-
-}
-
- function orderByTitle(superList) {
-         superList.sortByTitle();
-         displayTodos();
- }
-    
- function orderByDate(superList) {
-    superList.sortByCreationDate();
-    displayTodos();
-}
-
-function addButtonsListeners(superList) {
     const orderByTitleBtn = document.getElementById('order-title-btn')
     orderByTitleBtn.addEventListener('click', (event)=> orderByTitle(superList))
 
     const orderByDateBtn = document.getElementById('creation-date-btn')
     orderByDateBtn.addEventListener('click', (event)=> orderByDate(superList))
+
+    superListTitle.appendChild(titleNode);
+    for(let i=0; i<superList.todoArray.length;i++){
+        const todo=superList.todoArray[i];
+        let li='';
+       li += 
+`<li class='todo-li`;
+     if(todo.isCompleted){
+         superListUl.innerHTML += ` completed`;
+         console.log('mamma');
+     } 
+        
+    li+=`'><span class='todo-title'>
+        ${todo.title}
+    </span>
+    <span class='todo-date'>
+        ${todo.creationDate.toDateString()}
+    </span>
+    <button id= 'remove-btn${i}'> cancella </button>
+    <button id= 'completed-btn${i}'> completato </button>
+</li>`;
+    superListUl.innerHTML+=li;
+    console.log('remove-btn'+i);
+    const deletedBtn = document.getElementById('remove-btn'+i);
+    const completedBtn = document.getElementById('completed-btn'+i);
+    deletedBtn.addEventListener('click', (event)=>  superList.removeTodo(todo))
+    completedBtn.addEventListener('click', (event)=>  superList.completeTodo(todo))
+    
+    
+    }
 }
+
+
+function displayTodos2() {
+    const superListTitle = document.getElementById('list-name');
+    const superListUl = document.getElementById('todo-list');
+
+    const titleNode = document.createTextNode(superList.title);
+    superListTitle.innerHTML = '';
+    superListUl.innerHTML = '';
+
+    const orderByTitleBtn = document.getElementById('order-title-btn')
+    orderByTitleBtn.addEventListener('click', (event)=> orderByTitle(superList))
+
+    const orderByDateBtn = document.getElementById('creation-date-btn')
+    orderByDateBtn.addEventListener('click', (event)=> orderByDate(superList))
+
+    superListTitle.appendChild(titleNode);
+
+    for (let i = 0; i < superList.todoArray.length; i++) {
+        const todo = superList.todoArray[i];
+        const newLi =createLi(todo);
+        superListUl.appendChild(newLi);
+    }
+}
+
+
+
+
+function createLi(todo) {
+    const newLi = document.createElement('li');
+    newLi.classList.add('todo-li');
+    if (todo.isCompleted) {
+        newLi.classList.add('completed');
+        }
+    addTitleToLi(newLi,todo);
+    addDateToLi(newLi,todo);
+    createButtonDeleted(superList, newLi, todo);
+    createButtonCompleted(superList, newLi, todo);
+    return newLi;
+}
+
+function addTitleToLi(li,todo) {
+    const titleSpan = document.createElement('span');
+    titleSpan.classList.add('todo-title');
+    const titleNode = document.createTextNode(todo.title);
+    li.appendChild(titleSpan);
+    titleSpan.appendChild(titleNode);
+}
+
+function addDateToLi(li,todo) {
+    const dateSpan = document.createElement('span');
+    dateSpan.classList.add('todo-date');
+    const dateNode = document.createTextNode(todo.creationDate.toDateString());
+    li.appendChild(dateSpan);
+    dateSpan.appendChild(dateNode);
+}
+
+ function createButtonDeleted(superList, newLi, todo) {
+    const btnDeleted = document.createElement('button');
+    btnDeleted.addEventListener('click', (event)=>  superList.removeTodo(todo))
+    const deletedBtn = document.createTextNode('cancella');
+    btnDeleted.appendChild(deletedBtn);
+    newLi.appendChild(btnDeleted)
+ }
+
+ function createButtonCompleted(superList, newLi, todo) {
+    const btnCompleted = document.createElement('button');
+    btnCompleted.addEventListener('click', (event)=> superList.completeTodo(todo))
+    const completedBtn = document.createTextNode('completato');
+    btnCompleted.appendChild(completedBtn);
+    newLi.appendChild(btnCompleted);
+ }
+
+
+
+ function orderByTitle(superList) {
+    superList.sortByTitle();
+    displayTodos();
+}
+
+function orderByDate(superList) {
+superList.sortByCreationDate();
+displayTodos();
+}
+
 
 // [
 //     {

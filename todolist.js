@@ -21,6 +21,7 @@ class Todolist{
 
     removeTodo(todo){
         this.todoArray = this.todoArray.filter((element) => element!==todo)
+        displayTodos();
     }
 
     sortByTitle(){
@@ -32,8 +33,8 @@ class Todolist{
     }
 
     completeTodo(todo){
-        this.todoArray.map((element) => {if(element===todo)
-                                            element.isComplete=true;})
+        todo.isCompleted=true;
+        displayTodos();
     }
 
 
