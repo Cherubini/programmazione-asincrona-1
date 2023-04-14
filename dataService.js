@@ -21,13 +21,17 @@ class DataService {
 
     // }
 
-    // static putTodo(todo){
+    static putTodo(todo){
+        const jsonTodo = JSON.stringify(todo.toDbModel());
+        return fetch('https://643693e63e4d2b4a12d60917.mockapi.io/todos/'+todo.id, {method: 'PUT', headers:{'content-type':'application/json'}, body:jsonTodo})
+        .then(resp => resp.json())
+    }
 
-    // }
-
-    // static deleteTodo(todo){
-
-    // }
+    static deleteTodo(todo){
+        return fetch('https://643693e63e4d2b4a12d60917.mockapi.io/todos/'+todo.id, {method: 'DELETE'})
+        .then(resp => resp.json())
+    
+    }
 
 
 }

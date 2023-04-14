@@ -17,66 +17,63 @@ function fillTodoArrayFromServer(data) {
     }
 }
 
-function displayTodos() {
-    const superListUl = document.getElementById('todo-list');
+function displayTodos2() {
+
+
     const superListTitle = document.getElementById('list-name');
-    const titleNode = document.createTextNode(superList.title);
-    superListTitle.innerHTML = '';
+    const superListUl = document.getElementById('todo-list');
+    superListTitle.innerHTML = superList.title;
+    superListUl.innerHTML='';
+    for (let i = 0; i < superList.todoArray.length; i++) {
+        const todo = superList.todoArray[i];
+        console.log(todo);
+        superListUl.innerHTML += 
+    `<li class='todo-li ${todo.isCompleted ? 'completed' : ''}'>
+        <span class='todo-title '>${todo.title}</span>
+        <span class='todo-date'>${todo.creationDate.toDateString()}</span>
+        <button id= 'completed-btn${i}'> completato </button>
+        <button id= 'remove-btn${i}'> cancella </button>
+    </li>`
 
+    }
 
-    const orderByTitleBtn = document.getElementById('order-title-btn')
-    orderByTitleBtn.addEventListener('click', (event)=> orderByTitle(superList))
+    for (let i = 0; i < superList.todoArray.length; i++) {
+        const todo = superList.todoArray[i];
+        const completedBtn = document.getElementById(`completed-btn${i}`);
+        const deletedBtn = document.getElementById(`remove-btn${i}`);
 
-    const orderByDateBtn = document.getElementById('creation-date-btn')
-    orderByDateBtn.addEventListener('click', (event)=> orderByDate(superList))
+        deletedBtn.addEventListener('click', (event)=> {
+            superList.removeTodo(todo);
+            displayTodos();
+        })
 
-    superListTitle.appendChild(titleNode);
-    for(let i=0; i<superList.todoArray.length;i++){
-        const todo=superList.todoArray[i];
-        let li='';
-       li += 
-`<li class='todo-li`;
-     if(todo.isCompleted){
-         superListUl.innerHTML += ` completed`;
-         console.log('mamma');
-     } 
-        
-    li+=`'><span class='todo-title'>
-        ${todo.title}
-    </span>
-    <span class='todo-date'>
-        ${todo.creationDate.toDateString()}
-    </span>
-    <button id= 'remove-btn${i}'> cancella </button>
-    <button id= 'completed-btn${i}'> completato </button>
-</li>`;
-    superListUl.innerHTML+=li;
-    console.log('remove-btn'+i);
-    const deletedBtn = document.getElementById('remove-btn'+i);
-    const completedBtn = document.getElementById('completed-btn'+i);
-    deletedBtn.addEventListener('click', (event)=>  superList.removeTodo(todo))
-    completedBtn.addEventListener('click', (event)=>  superList.completeTodo(todo))
-    
+        completedBtn.addEventListener('click', (event)=> {
+            superList.completeTodo(todo);
+            displayTodos();
+        })
     
     }
 }
 
 
-function displayTodos2() {
-    const superListTitle = document.getElementById('list-name');
+function displayTodos() {
     const superListUl = document.getElementById('todo-list');
-
-    const titleNode = document.createTextNode(superList.title);
-    superListTitle.innerHTML = '';
     superListUl.innerHTML = '';
+    
+    displayListTitle();
 
     const orderByTitleBtn = document.getElementById('order-title-btn')
-    orderByTitleBtn.addEventListener('click', (event)=> orderByTitle(superList))
+    orderByTitleBtn.addEventListener('click', (event)=> {
+        orderByTitle(superList);
+        displayTodos();
+    })
 
     const orderByDateBtn = document.getElementById('creation-date-btn')
-    orderByDateBtn.addEventListener('click', (event)=> orderByDate(superList))
+    orderByDateBtn.addEventListener('click', (event)=> {
+        orderByDate(superList);
+        displayTodos();
+    })
 
-    superListTitle.appendChild(titleNode);
 
     for (let i = 0; i < superList.todoArray.length; i++) {
         const todo = superList.todoArray[i];
@@ -86,7 +83,12 @@ function displayTodos2() {
 }
 
 
-
+function displayListTitle() {
+    const superListTitle = document.getElementById('list-name');
+    const titleNode = document.createTextNode(superList.title);
+    superListTitle.innerHTML = '';
+    superListTitle.appendChild(titleNode);
+}
 
 function createLi(todo) {
     const newLi = document.createElement('li');
@@ -94,32 +96,41 @@ function createLi(todo) {
     if (todo.isCompleted) {
         newLi.classList.add('completed');
         }
-    addTitleToLi(newLi,todo);
-    addDateToLi(newLi,todo);
+    newLi.appendChild(createTitleToLi(todo));
+    newLi.appendChild(createDateToLi(todo));
+
     createButtonDeleted(superList, newLi, todo);
     createButtonCompleted(superList, newLi, todo);
     return newLi;
 }
 
-function addTitleToLi(li,todo) {
+function createTitleToLi(todo) {
     const titleSpan = document.createElement('span');
     titleSpan.classList.add('todo-title');
     const titleNode = document.createTextNode(todo.title);
-    li.appendChild(titleSpan);
+    //li.appendChild(titleSpan);
     titleSpan.appendChild(titleNode);
+    return titleSpan;
 }
 
-function addDateToLi(li,todo) {
+function createDateToLi(todo) {
     const dateSpan = document.createElement('span');
     dateSpan.classList.add('todo-date');
     const dateNode = document.createTextNode(todo.creationDate.toDateString());
-    li.appendChild(dateSpan);
+   // li.appendChild(dateSpan);
     dateSpan.appendChild(dateNode);
+    return dateSpan;
 }
 
  function createButtonDeleted(superList, newLi, todo) {
     const btnDeleted = document.createElement('button');
-    btnDeleted.addEventListener('click', (event)=>  superList.removeTodo(todo))
+    btnDeleted.addEventListener('click', (event)=>  
+        {
+        DataService.deleteTodo(todo).then(removedTodo =>{
+            superList.removeTodo(todo);
+            displayTodos();
+        })
+        });
     const deletedBtn = document.createTextNode('cancella');
     btnDeleted.appendChild(deletedBtn);
     newLi.appendChild(btnDeleted)
@@ -127,7 +138,15 @@ function addDateToLi(li,todo) {
 
  function createButtonCompleted(superList, newLi, todo) {
     const btnCompleted = document.createElement('button');
-    btnCompleted.addEventListener('click', (event)=> superList.completeTodo(todo))
+    btnCompleted.addEventListener('click', (event)=> 
+        {
+        superList.completeTodo(todo);
+        DataService.putTodo(todo).then(updatedTodo => {
+            displayTodos();
+            })
+        superList.completeTodo(todo);
+        displayTodos();
+        });
     const completedBtn = document.createTextNode('completato');
     btnCompleted.appendChild(completedBtn);
     newLi.appendChild(btnCompleted);
